@@ -21,7 +21,7 @@ public class Main {
             }
             passwords[0][i] = password;
 
-            for (int j = 1; j < 1999; j++) {
+            for (int j = 1; j < 2000; j++) {
                 passwords[1][i] = md5(passwords[0][i]);
                 passwords[1][i] = reduction(passwords[1][i], i);
 
