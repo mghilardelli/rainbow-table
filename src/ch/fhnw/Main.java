@@ -7,8 +7,9 @@ import java.security.NoSuchAlgorithmException;
 public class Main {
 
     static int PASSWORD_COUNT = 2000;
-
-    static String[] passwords = new String[PASSWORD_COUNT];
+    static String HASH = "1d56a37fb6b08aa709fe90e12ca59e12";
+    static String password;
+    static String[][] passwords = new String[2][PASSWORD_COUNT];
 
     public static void main(String[] args) {
         for (int i = 0; i < 2000; i++) {
@@ -16,12 +17,52 @@ public class Main {
             for (int j = 0; j < i; j++) {
                 password = generatePassword(password, 6);
             }
-            passwords[i] = password;
+            passwords[0][i] = password;
+
+            for (int j = 1; j < 2000; j++) {
+                passwords[1][i] = md5(passwords[0][i]);
+                passwords[1][i] = reduction(passwords[1][i], i);
+
+            }
         }
 
 
-        for (String s : passwords)
-            System.out.println(s);
+        for (int i = 0; i < PASSWORD_COUNT; i++)
+            System.out.println(passwords[0][i] + " " + passwords[1][i]);
+
+        for (int j = passwords[0].length - 1; j >= 0; j--) {
+            String actual = HASH;
+            System.out.print("Searching: " + j);
+
+            int a = j;
+            while (a < 2000) {
+                actual = reduction(actual, a);
+                System.out.print(actual + " - ");
+                actual = md5(actual);
+                System.out.print(actual + " - ");
+                a++;
+            }
+
+            actual = reduction(actual, a);
+            System.out.println(actual + " - ");
+            for (int i = 0; i < passwords[1].length; i++) {
+                if (passwords[1][i].equals(actual)) {
+                    password = passwords[0][i];
+                }
+            }
+        }
+
+        for (int i = 0; i < passwords[0].length; i++) {
+            String hashedPW = md5(password);
+            String pw;
+            if (hashedPW.equals(HASH)) {
+                pw = password;
+                System.out.println("PW was: " + pw);
+                break;
+            }
+            password = reduction(hashedPW, i);
+        }
+
     }
 
     private static String reduction(String hash, int step) {
@@ -32,7 +73,7 @@ public class Main {
 
         int L = 7;
         char[] Z = new char[36];
-        BigInteger Z_length =  BigInteger.valueOf(Z.length);
+        BigInteger Z_length = BigInteger.valueOf(Z.length);
 
         for (int i = 0; i < 10; i++) {
             Z[i] = (char) (i + 48);
@@ -48,13 +89,12 @@ public class Main {
             H = H.divide(Z_length);
         }
 
-        System.out.println("Reduction: " + result.toString());
         return result.toString();
     }
 
-    public static String md5 (String hash){
+    public static String md5(String hash) {
         String hashtext = "";
-        try{
+        try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(hash.getBytes());
             BigInteger number = new BigInteger(1, messageDigest);
@@ -63,10 +103,9 @@ public class Main {
             while (hashtext.length() < 32) {
                 hashtext = "0" + hashtext;
             }
-            System.out.println(hashtext);
             return hashtext;
 
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             System.out.println(e);
         }
         return hashtext;
