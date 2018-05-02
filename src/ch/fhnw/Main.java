@@ -1,5 +1,7 @@
 package ch.fhnw;
 
+import com.sun.istack.internal.NotNull;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,9 +27,8 @@ public class Main {
     }
 
     private static String reduction(String hash, int step) {
-        StringBuilder result = new StringBuilder("0000000");
+        StringBuilder clear_text = new StringBuilder("0000000");
         BigInteger H = new BigInteger(hash, 16);
-
         H = H.add(BigInteger.valueOf(step));
 
         int L = 7;
@@ -44,32 +45,23 @@ public class Main {
 
         for (int i = L - 1; i >= 0; i--) {
             char value = Z[H.mod(Z_length).intValue()];
-            result.setCharAt(i, value);
+            clear_text.setCharAt(i, value);
             H = H.divide(Z_length);
         }
 
-        System.out.println("Reduction: " + result.toString());
-        return result.toString();
+        System.out.println("Reduction: " + clear_text.toString());
+        return clear_text.toString();
     }
 
-    public static String md5 (String hash){
-        String hashtext = "";
+    public static String md5 (String input){
         try{
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(hash.getBytes());
-            BigInteger number = new BigInteger(1, messageDigest);
-            hashtext = number.toString(16);
-            // Now we need to zero pad it if you actually want the full 32 chars.
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
-            }
-            System.out.println(hashtext);
-            return hashtext;
-
+            byte[] messageDigest = md.digest(input.getBytes());
+            String hash = new BigInteger(1, messageDigest).toString(16);
+            return hash;
         }catch (NoSuchAlgorithmException e){
-            System.out.println(e);
+            throw new RuntimeException(e);
         }
-        return hashtext;
     }
 
     private static String generatePassword(String s, int pos) {
