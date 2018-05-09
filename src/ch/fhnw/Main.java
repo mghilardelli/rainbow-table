@@ -14,7 +14,7 @@ public class Main {
     static String password;
     static String[][] passwords = new String[2][PASSWORD_COUNT];
     static boolean isInIf = false;
-static int counter;
+    static int counter;
 
     public static void main(String[] args) {
         for (int i = 0; i < 2000; i++) {
@@ -32,52 +32,45 @@ static int counter;
         }
 
 
-        for (int i = 0; i < PASSWORD_COUNT; i++)
-            System.out.println(passwords[0][i] + " " + passwords[1][i]);
+        //    for (int i = 0; i < PASSWORD_COUNT; i++)
+//            System.out.println(passwords[0][i] + " " + passwords[1][i]);
 
-        for (int j = passwords[0].length - 1; j >= 0; j--) {
-            String actual = HASH;
-            System.out.print("Searching: " + j);
+        String p = reduction(HASH, 1999);
 
-            int a = j;
-            while (a < 2000) {
-                actual = reduction(actual, a);
-                System.out.print(actual + " - ");
-                actual = md5(actual);
-                System.out.print(actual + " - ");
-                a++;
-            }
+        for()
+        for (int j = 0 ;j < passwords[0].length; j++) {
+            if(passwords[1][j] == p){}
+                //found hash
 
-            actual = reduction(actual, a);
-            System.out.println(actual + " - ");
-            for (int i = 0; i < passwords[1].length; i++) {
-                if (passwords[1][i].equals(actual)) {
-                    password = passwords[0][i];
-                }
+
+
             }
         }
 
-        for (int i = 0; i < passwords[0].length; i++) {
+        /*for (int i = 0; i < passwords[0].length; i++) {
             String hashedPW = md5(password);
             String pw;
             if (hashedPW.equals(HASH)) {
                 pw = password;
-                System.out.println("PW was: " + pw);
+
                 break;
             }
             password = reduction(hashedPW, i);
-        }
+        }*/
+
+        System.out.println(searchForPW(HASH));
 
     }
-    private static String searchForPW(String pw){
-        String password = reduction(pw,1);
-        for(int i = 0; i < PASSWORD_COUNT;i++){
-            if( Arrays.asList(passwords[1]).contains(password)){
+
+    private static String searchForPW(String pw) {
+        String password = reduction(pw, 1);
+        for (int i = 0; i < PASSWORD_COUNT; i++) {
+            if (Arrays.asList(passwords[1]).contains(password)) {
                 isInIf = true;
                 counter = i;
                 return password;
 
-            }else{
+            } else {
                 isInIf = false;
                 password = algoHash1Step(password);
             }
@@ -127,13 +120,13 @@ static int counter;
     }
 
 
-    public static String md5 (String input){
-        try{
+    public static String md5(String input) {
+        try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes());
             String hash = new BigInteger(1, messageDigest).toString(16);
             return hash;
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -156,6 +149,7 @@ static int counter;
 
         return stringBuilder.toString();
     }
+
     public static String algoHash1Step(String pw) {
         for (int i = 0; i < 1; i++) {
             String password = pw;
@@ -164,11 +158,11 @@ static int counter;
             }
             passwords[0][i] = password;
 
-            for (int j = 1; j < 1; j++) {
-                passwords[1][i] = md5(passwords[0][i]);
-                passwords[1][i] = reduction(passwords[1][i], i);
 
-            }
+            passwords[1][i] = md5(passwords[0][i]);
+            passwords[1][i] = reduction(passwords[1][i], i);
+
+
         }
         return passwords[1][0];
     }
