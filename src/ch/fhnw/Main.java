@@ -5,6 +5,7 @@ import com.sun.istack.internal.NotNull;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class Main {
 
@@ -12,6 +13,8 @@ public class Main {
     static String HASH = "1d56a37fb6b08aa709fe90e12ca59e12";
     static String password;
     static String[][] passwords = new String[2][PASSWORD_COUNT];
+    static boolean isInIf = false;
+static int counter;
 
     public static void main(String[] args) {
         for (int i = 0; i < 2000; i++) {
@@ -66,6 +69,37 @@ public class Main {
         }
 
     }
+    private static String searchForPW(String pw){
+        String password = reduction(pw,1);
+        for(int i = 0; i < PASSWORD_COUNT;i++){
+            if( Arrays.asList(passwords[1]).contains(password)){
+                isInIf = true;
+                counter = i;
+                return password;
+
+            }else{
+                isInIf = false;
+                password = algoHash1Step(password);
+            }
+
+        }
+        return password;
+    }
+//findet nicht
+/*    private static String searchForPW(String pw){
+        String password = reduction(pw,1);
+        while (!isInIf && counter < PASSWORD_COUNT) {
+            if (passwords[1][passwords[1].length - 1].equals(password)) {
+                isInIf = true;
+
+                password = passwords[1][passwords[1].length-1];
+            } else {
+                isInIf = false;
+                counter++;
+                password = algoHash1Step(password);
+            }
+
+        }*/
 
     private static String reduction(String hash, int step) {
         StringBuilder clear_text = new StringBuilder("0000000");
@@ -121,5 +155,21 @@ public class Main {
         }
 
         return stringBuilder.toString();
+    }
+    public static String algoHash1Step(String pw) {
+        for (int i = 0; i < 1; i++) {
+            String password = pw;
+            for (int j = 0; j < i; j++) {
+                password = generatePassword(password, 6);
+            }
+            passwords[0][i] = password;
+
+            for (int j = 1; j < 1; j++) {
+                passwords[1][i] = md5(passwords[0][i]);
+                passwords[1][i] = reduction(passwords[1][i], i);
+
+            }
+        }
+        return passwords[1][0];
     }
 }
