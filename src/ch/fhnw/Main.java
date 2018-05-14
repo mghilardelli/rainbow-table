@@ -94,32 +94,44 @@ public class Main {
 
         }*/
 
+    /**
+     * Anwendung von alg. aus Folie 3.27
+     */
     private static String reduction(String hash, int step) {
         StringBuilder clear_text = new StringBuilder("0000000");
-        BigInteger H = new BigInteger(hash, 16);
+        BigInteger H = new BigInteger(hash, 16); //hashwert
         H = H.add(BigInteger.valueOf(step));
 
-        int L = 7;
-        char[] Z = new char[36];
+        int L = 7; //Länge des Passwortes
+        char[] Z = new char[36]; //mögliche Zeichen des Passwortes
         BigInteger Z_length = BigInteger.valueOf(Z.length);
 
+        //mögliche Zeichen von 0 bis 9 als ASCI
         for (int i = 0; i < 10; i++) {
             Z[i] = (char) (i + 48);
         }
 
+        //mögliche Zeichen von a bis z als ASCI
         for (int i = 10; i < 36; i++) {
             Z[i] = (char) (i + 87);
         }
 
         for (int i = L - 1; i >= 0; i--) {
             char value = Z[H.mod(Z_length).intValue()];
-            clear_text.setCharAt(i, value);
+            clear_text.setCharAt(i, value); //klar text konstruktion
             H = H.divide(Z_length);
         }
+
         return clear_text.toString();
     }
 
 
+    /**
+     * MD5 hashinb
+     * code inspiration:
+     * http://www.baeldung.com/java-md5
+     * http://www.asjava.com/core-java/java-md5-example/
+     */
     public static String md5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
