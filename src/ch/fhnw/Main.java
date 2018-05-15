@@ -13,8 +13,7 @@ public class Main {
     static String HASH = "1d56a37fb6b08aa709fe90e12ca59e12";
     static String password;
     static String[][] passwords = new String[2][PASSWORD_COUNT];
-    static boolean isInIf = false;
-static int counter;
+    static  int counter =0;
 
     public static void main(String[] args) {
         for (int i = 0; i < 2000; i++) {
@@ -24,15 +23,22 @@ static int counter;
             }
             passwords[0][i] = password;
 
+            passwords[1][i] = md5(passwords[0][i]);
+            passwords[1][i] = reduction(passwords[1][i],0);
             for (int j = 1; j < 2000; j++) {
-                passwords[1][i] = md5(passwords[0][i]);
-                passwords[1][i] = reduction(passwords[1][i], i);
+                passwords[1][i] = md5(passwords[1][i]);
+                passwords[1][i] = reduction(passwords[1][i], j);
 
             }
         }
 
+        String foundPassword = findHashInTable(HASH);
 
-        for (int i = 0; i < PASSWORD_COUNT; i++)
+
+        System.out.print(foundPassword);
+
+
+        /*for (int i = 0; i < PASSWORD_COUNT; i++)
             System.out.println(passwords[0][i] + " " + passwords[1][i]);
 
         for (int j = passwords[0].length - 1; j >= 0; j--) {
@@ -67,39 +73,10 @@ static int counter;
             }
             password = reduction(hashedPW, i);
         }
+*/
 
     }
-    private static String searchForPW(String pw){
-        String password = reduction(pw,1);
-        for(int i = 0; i < PASSWORD_COUNT;i++){
-            if( Arrays.asList(passwords[1]).contains(password)){
-                isInIf = true;
-                counter = i;
-                return password;
 
-            }else{
-                isInIf = false;
-                password = algoHash1Step(password);
-            }
-
-        }
-        return password;
-    }
-//findet nicht
-/*    private static String searchForPW(String pw){
-        String password = reduction(pw,1);
-        while (!isInIf && counter < PASSWORD_COUNT) {
-            if (passwords[1][passwords[1].length - 1].equals(password)) {
-                isInIf = true;
-
-                password = passwords[1][passwords[1].length-1];
-            } else {
-                isInIf = false;
-                counter++;
-                password = algoHash1Step(password);
-            }
-
-        }*/
 
     private static String reduction(String hash, int step) {
         StringBuilder clear_text = new StringBuilder("0000000");
@@ -127,13 +104,16 @@ static int counter;
     }
 
 
-    public static String md5 (String input){
-        try{
+    public static String md5(String input) {
+        try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes());
             String hash = new BigInteger(1, messageDigest).toString(16);
+            while (hash.length() < 32) {
+                hash = "0" + hash;
+            }
             return hash;
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -156,20 +136,32 @@ static int counter;
 
         return stringBuilder.toString();
     }
-    public static String algoHash1Step(String pw) {
-        for (int i = 0; i < 1; i++) {
-            String password = pw;
-            for (int j = 0; j < i; j++) {
-                password = generatePassword(password, 6);
-            }
-            passwords[0][i] = password;
 
-            for (int j = 1; j < 1; j++) {
-                passwords[1][i] = md5(passwords[0][i]);
-                passwords[1][i] = reduction(passwords[1][i], i);
+    //http://royvanrijn.com/blog/2011/01/rainbow-tables/ Find Hash
+    public static String findHashInTable(String searching) {
+        for (int i = passwords[0].length -1; i > -1; i--) {
+            String momentum = searching;
+
+            int x = i;
+            while (x < 1999) {
+                momentum = reduction(momentum, x);
+                momentum = md5(momentum);
+                x++;
+                counter++;
 
             }
-        }
-        return passwords[1][0];
+            momentum = reduction(momentum,1999);
+
+
+    if (Arrays.asList(passwords[1]).contains(momentum)) {
+        momentum = md5(momentum);
+        momentum = reduction(momentum,counter-2);
+        return momentum;
+    }
+}
+
+        System.out.print(counter);
+        return "Not found !!";
+
     }
 }
