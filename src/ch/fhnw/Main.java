@@ -105,7 +105,7 @@ public class Main {
         return text;
     }
 
-//fixed this
+    //fixed this
     //http://royvanrijn.com/blog/2011/01/rainbow-tables/ Find Hash
     public static String tryToFindPw(String searching) {
         for (int i = 2000; i > -1; i--) {
