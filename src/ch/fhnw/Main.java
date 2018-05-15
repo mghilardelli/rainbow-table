@@ -82,13 +82,13 @@ public class Main {
         StringBuilder stringBuilder = new StringBuilder(s);
         int i = (int) stringBuilder.charAt(pos);
 
-        if (i >= 48 && i <= 56) {
+        if (i >= '0' && i <= '8') {
             stringBuilder.setCharAt(pos, (char) (i + 1));
-        } else if (i == 57) {
+        } else if (i == '9') {
             stringBuilder.setCharAt(pos, 'a');
-        } else if (i >= 97 && i <= 121) {
+        } else if (i >= 'a' && i <= 'y') {
             stringBuilder.setCharAt(pos, (char) (i + 1));
-        } else if (i == 122) {
+        } else if (i == 'z') {
             String received = generatePassword(stringBuilder.toString(), (pos - 1));
             stringBuilder.delete(0, 7).append(received);
             stringBuilder.setCharAt(pos, '0');
@@ -96,8 +96,7 @@ public class Main {
 
         return stringBuilder.toString();
     }
-//fixed this
-    //http://royvanrijn.com/blog/2011/01/rainbow-tables/ Find Hash
+
     public static String tryToFindPw(String searching) {
         for (int i = passwords[0].length - 1; i > -1; i--) {
             String momentum = searching;
