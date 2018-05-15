@@ -38,27 +38,32 @@ public class Main {
     }
 
 
+    /**
+     * the algorithm from Slide 3.27
+     */
     private static String reduction(String hash, int step) {
         StringBuilder clear_text = new StringBuilder("0000000");
         BigInteger H = new BigInteger(hash, 16);
-        H = H.add(BigInteger.valueOf(step));
+        H = H.add(BigInteger.valueOf(step)); //hasvalue
 
-        int L = 7;
-        char[] Z = new char[36];
+        int L = 7; //password length
+        char[] Z = new char[36]; //characters from password
         BigInteger Z_length = BigInteger.valueOf(Z.length);
 
+        //characters from 0 to 9
         for (int i = 0; i < 10; i++) {
             Z[i] = (char) (i + 48);
         }
 
+        //characters from a to z
         for (int i = 10; i < 36; i++) {
             Z[i] = (char) (i + 87);
         }
 
         for (int i = L - 1; i >= 0; i--) {
             char value = Z[H.mod(Z_length).intValue()];
-            clear_text.setCharAt(i, value);
-            H = H.divide(Z_length);
+            clear_text.setCharAt(i, value); //clear value construction
+            H = H.divide(Z_length); 
         }
         return clear_text.toString();
     }
