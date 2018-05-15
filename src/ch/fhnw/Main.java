@@ -17,7 +17,7 @@ public class Main {
         for (int i = 0; i < 2000; i++) {
             String password = "0000000";
             for (int j = 0; j < i; j++) {
-                password = generatePassword(password, 6);
+                password = generatePassword(i);
             }
             passwords[0][i] = password;
 
@@ -66,9 +66,11 @@ public class Main {
 
     public static String md5(String input) {
         try {
+            //Java API to generate MD5 hashes
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes());
             String hash = new BigInteger(1, messageDigest).toString(16);
+            //needed to ask for lengh so the string will be 32 bit long.
             while (hash.length() < 32) {
                 hash = "0" + hash;
             }
@@ -77,29 +79,36 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+    private static String generatePassword(int num) {
+        //Github FTW
 
-    private static String generatePassword(String s, int pos) {
-        StringBuilder stringBuilder = new StringBuilder(s);
-        int i = (int) stringBuilder.charAt(pos);
-
-        if (i >= 48 && i <= 56) {
-            stringBuilder.setCharAt(pos, (char) (i + 1));
-        } else if (i == 57) {
-            stringBuilder.setCharAt(pos, 'a');
-        } else if (i >= 97 && i <= 121) {
-            stringBuilder.setCharAt(pos, (char) (i + 1));
-        } else if (i == 122) {
-            String received = generatePassword(stringBuilder.toString(), (pos - 1));
-            stringBuilder.delete(0, 7).append(received);
-            stringBuilder.setCharAt(pos, '0');
+        String charSet = "0123456789abcdefghijklmnopqrstuvwxyz";
+        String text = "";
+        //case 0: would ceil to -0
+        if(num == 0){
+            text = "0";
         }
-
-        return stringBuilder.toString();
+        //case 1: would ceil to 0 had to check this case
+        if(num == 1){
+            text = "1";
+            //everythin > 1 works.had to check this case
+        }else {
+            int j = (int) Math.ceil(Math.log(num) / Math.log(charSet.length()));
+            for (int i = 0; i < j; i++) {
+                text += charSet.charAt(num % charSet.length());
+                num /= charSet.length();
+            }
+        }
+        while (text.length() < 7) {
+            text = "0" + text;
+        }
+        return text;
     }
+
 //fixed this
     //http://royvanrijn.com/blog/2011/01/rainbow-tables/ Find Hash
     public static String tryToFindPw(String searching) {
-        for (int i = passwords[0].length - 1; i > -1; i--) {
+        for (int i = 2000; i > -1; i--) {
             String momentum = searching;
             int step = i;
 
@@ -107,19 +116,23 @@ public class Main {
                 momentum = reduction(momentum, step);
                 momentum = md5(momentum);
                 step++;
-
-
             }
+            //initial last step reduction 1999 of hash. Last step after the while loop when hash isnt the last possition.
             momentum = reduction(momentum, 1999);
 
+//iterates over the last values of the Table
             if (Arrays.asList(passwords[1]).contains(momentum)) {
+                //returns index of table where it has found the value
                 int index = Arrays.asList(passwords[1]).indexOf(momentum);
+                //temporary variable which stores the value of the initial password that generates the chain.
                 String temp = passwords[0][index];
+                //loops the hash reduction algo unitl the step i -1 which the value was found!
                 for (int p = 0; p < i; p++) {
                     temp = md5(temp);
                     temp = reduction(temp, p);
 
                 }
+
                 return temp;
             }
 
