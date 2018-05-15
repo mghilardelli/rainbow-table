@@ -96,7 +96,7 @@ public class Main {
 
         return stringBuilder.toString();
     }
-
+//fixed this
     //http://royvanrijn.com/blog/2011/01/rainbow-tables/ Find Hash
     public static String tryToFindPw(String searching) {
         for (int i = passwords[0].length - 1; i > -1; i--) {
